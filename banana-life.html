@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>香蕉的一生｜单页滚动科普（线框）</title>
+    <meta name="description" content="香蕉从植株生长、开花结果、采收运输到家庭成熟与保存的单页滚动科普（线框原型）。" />
+    <style>
+      :root {
+        --bg:      oklch(98% 0.004 240);
+        --surface: oklch(100% 0 0);
+        --fg:      oklch(20% 0.02 240);
+        --muted:   oklch(50% 0.018 240);
+        --border:  oklch(90% 0.006 240);
+        --accent:  oklch(56% 0.12 170);
+
+        --font-display: "Söhne", "Avenir Next", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        --font-body:    -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      }
+
+      :root{
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        --accent2: oklch(62% 0.12 265);
+        --success: oklch(66% 0.14 145);
+        --warn:    oklch(82% 0.14 85);
+        --danger:  oklch(64% 0.20 25);
+        --info:    oklch(70% 0.12 230);
+        --container: 1120px;
+        --gutter: 24px;
+        --bw: 1px;
+        --rsm: 10px;
+        --rmd: 14px;
+        --rlg: 18px;
+        --shadow-soft: 0 14px 42px oklch(20% 0.02 240 / .10);
+      }
+
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:var(--font-body);
+        color:var(--fg);
+        line-height:1.55;
+        text-wrap:pretty;
+        background:
+          radial-gradient(980px 420px at 12% -10%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 64%),
+          radial-gradient(920px 520px at 92% 12%, color-mix(in oklch, var(--accent2) 10%, transparent), transparent 64%),
+          var(--bg);
+      }
+
+      a{color:inherit;text-decoration:none}
+      a:hover{text-decoration:underline}
+      :focus-visible{outline:3px solid color-mix(in oklch, var(--accent) 42%, white);outline-offset:2px;border-radius:12px}
+      .container{width:min(var(--container), calc(100% - var(--gutter)*2));margin:0 auto}
+      .muted{color:var(--muted)}
+      .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+      .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+      /* Nav */
+      .skip-link{position:fixed;left:16px;top:12px;z-index:200;transform:translateY(-170%);transition:transform 140ms ease;text-decoration:none!important}
+      .skip-link:focus-visible{transform:translateY(0)}
+
+      .nav{
+        position:sticky;top:0;z-index:100;
+        border-bottom:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 86%, transparent);
+        backdrop-filter:blur(10px);
+      }
+      .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0}
+      .brand{display:flex;align-items:center;gap:10px;min-width:220px}
+      .mark{
+        width:28px;height:28px;border-radius:12px;border:var(--bw) solid var(--border);
+        background:
+          radial-gradient(18px 18px at 30% 30%, color-mix(in oklch, var(--accent) 40%, white), transparent 70%),
+          linear-gradient(135deg, color-mix(in oklch, var(--accent) 18%, white), color-mix(in oklch, var(--accent2) 8%, white));
+      }
+      .brand-name{font-family:var(--font-display);letter-spacing:-.02em;font-weight:820;font-size:14px}
+      .brand-sub{font-size:12px;color:var(--muted)}
+      .nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+      .nav-links a{
+        padding:8px 10px;border-radius:12px;
+        font-size:13px;color:var(--muted);
+        border:var(--bw) solid transparent;
+      }
+      .nav-links a[data-active="true"]{
+        color:var(--fg);
+        background:color-mix(in oklch, var(--accent) 12%, var(--surface));
+        border-color:color-mix(in oklch, var(--accent) 22%, var(--border));
+      }
+      .actions{display:flex;align-items:center;gap:10px}
+
+      .btn{
+        display:inline-flex;align-items:center;justify-content:center;gap:10px;
+        height:40px;padding:0 14px;border-radius:12px;
+        border:var(--bw) solid var(--border);
+        background:var(--surface);
+        color:var(--fg);
+        font-weight:750;font-size:13px;letter-spacing:-.01em;
+        cursor:pointer;user-select:none;
+        transition:transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      }
+      .btn:hover{background:color-mix(in oklch, var(--surface) 92%, var(--accent))}
+      .btn:active{transform:translateY(1px)}
+      .btn-primary{
+        border-color:color-mix(in oklch, var(--accent) 36%, var(--border));
+        background:color-mix(in oklch, var(--accent) 14%, var(--surface));
+      }
+      .btn-quiet{color:var(--muted)}
+
+      .progress{
+        position:sticky;top:53px;z-index:95;height:3px;
+        background:color-mix(in oklch, var(--border) 70%, transparent);
+      }
+      .bar{
+        height:100%;width:0%;
+        background:linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent2) 65%, var(--accent)));
+      }
+
+      /* Layout */
+      header.hero{padding:34px 0 16px}
+      .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:16px;align-items:stretch}
+      .card{
+        border:var(--bw) solid var(--border);
+        border-radius:var(--rlg);
+        background:color-mix(in oklch, var(--surface) 88%, transparent);
+      }
+      .pad{padding:18px}
+      .hero-title{
+        margin:10px 0 10px;
+        font-family:var(--font-display);
+        letter-spacing:-.04em;
+        font-size:clamp(34px, 3.2vw, 48px);
+        line-height:1.06;
+      }
+      .lede{margin:0;color:var(--muted);max-width:78ch}
+      .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+      .pill{
+        display:inline-flex;align-items:center;gap:8px;
+        padding:7px 10px;border-radius:999px;
+        border:var(--bw) solid color-mix(in oklch, var(--border) 88%, var(--fg));
+        background:color-mix(in oklch, var(--surface) 92%, var(--accent));
+        font-size:12px;color:var(--muted);
+      }
+      .pill i{width:6px;height:6px;border-radius:999px;background:var(--accent)}
+      .quick{
+        display:grid;gap:10px;
+      }
+      .mini{
+        border-radius:14px;border:var(--bw) dashed color-mix(in oklch, var(--border) 78%, var(--muted));
+        background:color-mix(in oklch, var(--bg) 56%, var(--surface));
+        padding:12px;
+      }
+      .mini h3{margin:0 0 6px;font-size:13px;letter-spacing:-.01em}
+      .mini p{margin:0;color:var(--muted);font-size:13px}
+
+      main{padding:6px 0 64px}
+      .section{margin-top:18px}
+      .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}
+      h2{
+        margin:0;
+        font-family:var(--font-display);
+        letter-spacing:-.03em;
+        font-size:22px;
+      }
+      .kicker{font-size:12px;color:var(--muted)}
+      .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+      .grid-3{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;align-items:stretch}
+
+      .placeholder{
+        border-radius:14px;border:var(--bw) dashed color-mix(in oklch, var(--border) 78%, var(--muted));
+        background:color-mix(in oklch, var(--bg) 60%, var(--surface));
+        min-height:160px;
+        display:grid;place-items:center;
+        color:color-mix(in oklch, var(--muted) 84%, var(--fg));
+        font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+      }
+
+      /* Glossary */
+      .glossary{display:grid;gap:10px}
+      .term{
+        display:grid;gap:8px;padding:14px 14px 12px;border-radius:16px;
+        border:var(--bw) solid var(--border);background:var(--surface);
+      }
+      .term-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+      .term strong{font-size:14px;letter-spacing:-.01em}
+      .tag{
+        font-size:12px;color:var(--muted);
+        padding:4px 8px;border-radius:999px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 90%, var(--bg));
+      }
+      .term p{margin:0;color:var(--muted);font-size:13px}
+
+      /* Timeline */
+      .timeline{
+        display:grid;grid-template-columns: 1fr 1.2fr;gap:12px;align-items:start;
+      }
+      .steps{padding:10px}
+      .step{
+        width:100%;
+        text-align:left;
+        display:flex;gap:10px;align-items:flex-start;
+        padding:12px 12px;border-radius:14px;
+        background:transparent;border:var(--bw) solid transparent;
+        cursor:pointer;
+      }
+      .step:hover{background:color-mix(in oklch, var(--surface) 86%, var(--accent))}
+      .step[aria-current="true"]{
+        background:color-mix(in oklch, var(--accent) 12%, var(--surface));
+        border-color:color-mix(in oklch, var(--accent) 22%, var(--border));
+      }
+      .dot{
+        width:10px;height:10px;border-radius:999px;
+        margin-top:4px;background:var(--accent);
+        box-shadow:0 0 0 6px color-mix(in oklch, var(--accent) 16%, transparent);
+        flex:0 0 auto;
+      }
+      .step h4{margin:0;font-size:13px;letter-spacing:-.01em}
+      .step p{margin:6px 0 0;color:var(--muted);font-size:12px}
+      .detail{padding:16px}
+      .detail h3{
+        margin:0 0 8px;
+        font-family:var(--font-display);
+        letter-spacing:-.02em;
+        font-size:18px;
+      }
+      .detail ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+      .detail li{margin:6px 0}
+      .note{
+        margin-top:12px;
+        border-radius:14px;border:var(--bw) solid color-mix(in oklch, var(--info) 26%, var(--border));
+        background:color-mix(in oklch, var(--info) 10%, var(--surface));
+        padding:10px 12px;color:var(--muted);font-size:13px;
+      }
+
+      /* Ripeness */
+      .ripeness{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;align-items:start}
+      .range{
+        display:grid;gap:10px;
+      }
+      input[type="range"]{width:100%}
+      .r-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .chip{
+        display:inline-flex;align-items:center;gap:8px;
+        border-radius:999px;border:var(--bw) solid var(--border);
+        padding:6px 10px;background:color-mix(in oklch, var(--surface) 92%, var(--bg));
+        font-size:12px;color:var(--muted);
+      }
+      .swatch{
+        width:10px;height:10px;border-radius:999px;border:var(--bw) solid color-mix(in oklch, var(--border) 90%, var(--fg));
+        background:var(--accent);
+      }
+      .r-card h3{margin:0 0 6px;font-size:16px;font-family:var(--font-display);letter-spacing:-.02em}
+      .r-card p{margin:0;color:var(--muted);font-size:13px}
+      .r-uses{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+      .use{
+        font-size:12px;color:var(--muted);
+        border-radius:999px;border:var(--bw) solid var(--border);
+        padding:6px 10px;background:color-mix(in oklch, var(--surface) 90%, var(--accent));
+      }
+
+      /* Storage decision */
+      .decision{display:grid;gap:10px}
+      .q{
+        border-radius:16px;border:var(--bw) solid var(--border);background:var(--surface);padding:14px;
+        display:grid;gap:10px;
+      }
+      .q h3{margin:0;font-size:14px;letter-spacing:-.01em}
+      .q .opts{display:flex;flex-wrap:wrap;gap:10px}
+      .opt{
+        border-radius:12px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--bg));
+        padding:10px 12px;cursor:pointer;
+        font-size:13px;color:var(--muted);
+      }
+      .opt[aria-pressed="true"]{
+        color:var(--fg);
+        border-color:color-mix(in oklch, var(--accent) 24%, var(--border));
+        background:color-mix(in oklch, var(--accent) 12%, var(--surface));
+      }
+      .advice{
+        border-radius:16px;border:var(--bw) solid color-mix(in oklch, var(--success) 22%, var(--border));
+        background:color-mix(in oklch, var(--success) 10%, var(--surface));
+        padding:14px;color:var(--muted);font-size:13px;
+      }
+      .advice strong{color:var(--fg)}
+      .advice .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+      .advice pre{
+        margin:10px 0 0;
+        padding:10px 12px;border-radius:14px;
+        background:color-mix(in oklch, var(--surface) 86%, var(--bg));
+        border:var(--bw) solid var(--border);
+        color:color-mix(in oklch, var(--muted) 88%, var(--fg));
+        overflow:auto;
+        font-family:var(--font-mono);font-size:12px;line-height:1.45;
+      }
+
+      /* FAQ */
+      details.faq{
+        border:var(--bw) solid var(--border);
+        border-radius:var(--rlg);
+        background:var(--surface);
+        padding:14px 16px;
+      }
+      details.faq + details.faq{margin-top:10px}
+      details.faq summary{
+        list-style:none;cursor:pointer;
+        display:flex;align-items:center;justify-content:space-between;gap:14px;
+        font-weight:800;letter-spacing:-.01em;
+      }
+      details.faq summary::-webkit-details-marker{display:none}
+      .chev{
+        width:10px;height:10px;
+        border-right:2px solid color-mix(in oklch, var(--muted) 80%, var(--fg));
+        border-bottom:2px solid color-mix(in oklch, var(--muted) 80%, var(--fg));
+        transform:rotate(45deg);
+        transition:transform 140ms ease;
+      }
+      details[open] .chev{transform:rotate(225deg)}
+      .faq-body{color:var(--muted);margin-top:10px;max-width:78ch;font-size:13px}
+      .disclaimer{
+        margin-top:10px;
+        border-radius:14px;border:var(--bw) solid color-mix(in oklch, var(--warn) 28%, var(--border));
+        background:color-mix(in oklch, var(--warn) 10%, var(--surface));
+        padding:10px 12px;color:var(--muted);font-size:13px;
+      }
+
+      /* Quiz */
+      .quiz{display:grid;gap:10px}
+      .qz{
+        border-radius:16px;border:var(--bw) solid var(--border);background:var(--surface);
+        padding:14px;
+      }
+      .qz h3{margin:0 0 8px;font-size:14px;letter-spacing:-.01em}
+      .qz .choices{display:grid;gap:8px}
+      .choice{
+        text-align:left;
+        width:100%;
+        border-radius:12px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--bg));
+        padding:10px 12px;
+        cursor:pointer;
+        color:var(--muted);
+        font-size:13px;
+      }
+      .choice:hover{background:color-mix(in oklch, var(--surface) 90%, var(--accent))}
+      .choice[aria-pressed="true"]{
+        color:var(--fg);
+        border-color:color-mix(in oklch, var(--accent) 26%, var(--border));
+        background:color-mix(in oklch, var(--accent) 12%, var(--surface));
+      }
+      .feedback{
+        margin-top:10px;
+        border-radius:14px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--bg));
+        padding:10px 12px;color:var(--muted);font-size:13px;
+        display:none;
+      }
+      .feedback[data-show="true"]{display:block}
+      .score{
+        display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+        margin-top:10px;
+        padding:12px;border-radius:16px;border:var(--bw) solid color-mix(in oklch, var(--info) 26%, var(--border));
+        background:color-mix(in oklch, var(--info) 10%, var(--surface));
+        color:var(--muted);font-size:13px;
+      }
+      .score strong{color:var(--fg)}
+
+      footer{
+        margin-top:26px;
+        border-top:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 86%, transparent);
+        padding:22px 0;
+        color:var(--muted);
+      }
+      .footer-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+      .footer-links{display:flex;gap:14px;flex-wrap:wrap}
+
+      @media (max-width:980px){
+        .hero-grid{grid-template-columns:1fr}
+        .grid-2{grid-template-columns:1fr}
+        .grid-3{grid-template-columns:1fr}
+        .timeline{grid-template-columns:1fr}
+        .ripeness{grid-template-columns:1fr}
+        .actions{display:none}
+        .brand{min-width:0}
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link btn" href="#main">跳到正文</a>
+
+    <nav class="nav" aria-label="页面导航">
+      <div class="container nav-inner">
+        <div class="brand" aria-label="页面标题">
+          <div class="mark" aria-hidden="true"></div>
+          <div>
+            <div class="brand-name">香蕉的一生</div>
+            <div class="brand-sub">单页滚动科普（线框原型）</div>
+          </div>
+        </div>
+
+        <div class="nav-links" role="navigation" aria-label="章节">
+          <a href="#what" data-nav="what">认识</a>
+          <a href="#life" data-nav="life">生命周期</a>
+          <a href="#ripeness" data-nav="ripeness">成熟度</a>
+          <a href="#storage" data-nav="storage">保存</a>
+          <a href="#myths" data-nav="myths">误区</a>
+          <a href="#quiz" data-nav="quiz">小测验</a>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-quiet" id="btnCopySummary" type="button">复制要点</button>
+          <a class="btn btn-primary" href="#quiz">做 3 分钟测验</a>
+        </div>
+      </div>
+    </nav>
+    <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+
+    <header class="hero">
+      <div class="container hero-grid">
+        <section class="card pad" aria-label="简介">
+          <div class="meta">
+            <span class="pill"><i></i>适合：亲子 / 自己做饭 / 想买对熟度</span>
+            <span class="pill"><i></i>读完你会：会挑、会催熟、会保存</span>
+            <span class="pill"><i></i>交互：时间线 + 成熟度滑块 + 小测验</span>
+          </div>
+          <h1 class="hero-title">从一棵“草”到一根香蕉：它的一生到底发生了什么？</h1>
+          <p class="lede">
+            你在超市看到的那把青香蕉，可能已经经历了：热带田间生长、采收、低温运输、催熟仓释放乙烯、货架继续变黄……这页把流程拆开，帮你把“看起来差不多”的香蕉，变成可判断、可操作的选择。
+          </p>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn btn-primary" href="#life">从生命周期开始</a>
+            <a class="btn" href="#storage">直接看保存</a>
+            <button class="btn btn-quiet" id="btnReset" type="button">重置交互状态</button>
+          </div>
+          <p class="muted" style="margin:12px 0 0;font-size:12px">
+            线框说明：信息结构与交互已到位；插图、照片与更细数据可在你确认方向后再补。
+          </p>
+        </section>
+
+        <aside class="card pad" aria-label="本页结构（线框）">
+          <div class="quick">
+            <div class="mini">
+              <h3>你现在看到的</h3>
+              <p>带锚点的单页滚动 + 章节高亮 + 阅读进度条（移动端自动折行）。</p>
+            </div>
+            <div class="mini">
+              <h3>我们不做的</h3>
+              <p>不堆“10× 更快/99.9%”这类无来源数字；不知道的用诚实占位。</p>
+            </div>
+            <div class="mini">
+              <h3>可升级的下一步</h3>
+              <p>插入 1 张真实照片（田间或货架）+ 1 张简化图（运输链路）。</p>
+            </div>
+            <div class="placeholder" aria-label="插图占位">插图占位（后续可替换真实照片/示意图）</div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main id="main" class="container">
+      <!-- Section: What is banana -->
+      <section class="section" id="what" data-section="what">
+        <div class="section-head">
+          <div>
+            <div class="kicker">01 / 认识香蕉</div>
+            <h2>香蕉是什么？先把几个常见词说清楚</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">目标：用 90 秒建立正确心智模型</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card pad">
+            <p class="muted" style="margin:0 0 10px;font-size:13px">
+              香蕉（常见栽培种）来自热带/亚热带的芭蕉科作物。它没有“木质树干”，你看到的“树干”多数是叶鞘层层包裹形成的假茎——更像一棵巨大的草本植物。
+            </p>
+            <div class="glossary">
+              <div class="term">
+                <div class="term-top">
+                  <strong>“香蕉树”其实是草本</strong>
+                  <span class="tag">形态</span>
+                </div>
+                <p>不是木本树干；假茎来自叶鞘。理解这一点有助于理解它的生长速度与倒伏风险。</p>
+              </div>
+              <div class="term">
+                <div class="term-top">
+                  <strong>“把 / 梳 / 串”</strong>
+                  <span class="tag">称呼</span>
+                </div>
+                <p>一串（bunch）上有多把（hands）；每把里是一根根果实（fingers）。超市常见是一把。</p>
+              </div>
+              <div class="term">
+                <div class="term-top">
+                  <strong>香蕉是“浆果”</strong>
+                  <span class="tag">植物学</span>
+                </div>
+                <p>很多人以为浆果=小小圆圆的；但在植物学分类里，香蕉也属于浆果的一种。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card pad">
+            <div class="placeholder" style="min-height:220px">结构示意占位（果皮/果肉/纤维）</div>
+            <p class="muted" style="margin:10px 0 0;font-size:13px">
+              插图建议（后续补）：剖面标注“果皮/果肉/纤维/籽点（栽培品种多为空籽或籽退化）”，并配一句：你在口感上感到的“筋”，通常与纤维结构有关。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Life cycle -->
+      <section class="section" id="life" data-section="life">
+        <div class="section-head">
+          <div>
+            <div class="kicker">02 / 生命周期</div>
+            <h2>从田间到你手里：把过程拆成 9 个阶段</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">交互：点左侧阶段 → 右侧显示“你能看到什么/你能做什么”</div>
+        </div>
+
+        <div class="card timeline">
+          <div class="steps" role="list" aria-label="生命周期阶段列表" id="steps"></div>
+          <div class="detail" aria-live="polite">
+            <div class="kicker mono" id="lifeIndex">阶段 01</div>
+            <h3 id="lifeTitle">—</h3>
+            <p class="muted" id="lifeDesc" style="margin:0"></p>
+            <ul id="lifeBullets"></ul>
+            <div class="note" id="lifeNote"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Ripeness -->
+      <section class="section" id="ripeness" data-section="ripeness">
+        <div class="section-head">
+          <div>
+            <div class="kicker">03 / 成熟度</div>
+            <h2>成熟度 1–7：颜色只是表象，关键是“用途”</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">交互：拖动滑块 → 更新口感/用途建议</div>
+        </div>
+
+        <div class="card ripeness">
+          <div class="pad range">
+            <div class="r-row">
+              <span class="chip"><span class="swatch" id="ripSwatch" aria-hidden="true"></span><span id="ripLabel">阶段 4：黄绿相间</span></span>
+              <span class="chip mono">RIPENESS=<span id="ripVal">4</span>/7</span>
+            </div>
+            <label class="sr-only" for="ripenessRange">成熟度</label>
+            <input id="ripenessRange" type="range" min="1" max="7" value="4" step="1" />
+            <p class="muted" style="margin:0;font-size:13px">
+              小提醒：同一把香蕉，靠近果柄和靠近果尖的成熟度也会略不同；这页用“典型状态”帮助你做选择。
+            </p>
+            <div class="placeholder" style="min-height:180px" id="ripViz" aria-label="成熟度示意占位">成熟度示意占位（颜色/褐点/用途）</div>
+          </div>
+
+          <div class="pad r-card">
+            <h3 id="ripTitle">适合直接吃：口感偏脆、甜度开始上来</h3>
+            <p id="ripDesc">你可能会在超市买到这种状态：颜色开始转黄，但还没出现明显褐点。带回家放 1–2 天更甜。</p>
+            <div class="r-uses" id="ripUses" aria-label="用途建议"></div>
+            <div class="note" style="margin-top:12px">
+              线框占位：后续可以加入“淀粉→糖”的简图（不需要给出具体百分比，避免无来源数字）。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Storage -->
+      <section class="section" id="storage" data-section="storage">
+        <div class="section-head">
+          <div>
+            <div class="kicker">04 / 保存与催熟</div>
+            <h2>在家怎么放：用 2 个问题给出最实用的建议</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">交互：选择选项 → 生成建议 + 可复制清单</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card pad decision" aria-label="保存决策器">
+            <div class="q" data-q="when">
+              <h3>你打算什么时候吃？</h3>
+              <div class="opts" role="group" aria-label="食用时间">
+                <button class="opt" type="button" data-q="when" data-v="today" aria-pressed="true">今天 / 明天</button>
+                <button class="opt" type="button" data-q="when" data-v="soon" aria-pressed="false">2–3 天内</button>
+                <button class="opt" type="button" data-q="when" data-v="later" aria-pressed="false">3 天以上</button>
+              </div>
+            </div>
+
+            <div class="q" data-q="state">
+              <h3>你手上的香蕉现在更像哪一种？</h3>
+              <div class="opts" role="group" aria-label="当前熟度">
+                <button class="opt" type="button" data-q="state" data-v="green" aria-pressed="true">偏青偏硬</button>
+                <button class="opt" type="button" data-q="state" data-v="yellow" aria-pressed="false">偏黄能吃</button>
+                <button class="opt" type="button" data-q="state" data-v="spotty" aria-pressed="false">有褐点更甜</button>
+              </div>
+            </div>
+
+            <div class="advice" id="advice" aria-live="polite">
+              <div class="row">
+                <strong id="adviceTitle">建议：常温通风 + 分开摆放</strong>
+                <button class="btn btn-quiet" type="button" id="btnCopyAdvice">复制</button>
+              </div>
+              <div id="adviceBody" style="margin-top:8px">
+                让香蕉在室温、阴凉通风处自然成熟；避免与强烈气味食物贴放。若想更快变黄，可用纸袋轻包并留一点透气口。
+              </div>
+              <pre id="adviceCopy">香蕉保存小抄：
+- 室温阴凉通风，避免太阳直晒
+- 想催熟：纸袋 + 透气口（可同放 1 个苹果/梨以增加乙烯）
+- 冰箱：果皮会更快变黑不等于坏；更建议“已经熟了再放冷藏”
+- 冷冻：剥皮切段冷冻，适合做奶昔/烘焙</pre>
+            </div>
+          </div>
+
+          <div class="card pad" aria-label="关键原理（线框）">
+            <div class="placeholder" style="min-height:220px">运输与催熟示意占位（控温/乙烯/货架）</div>
+            <p class="muted" style="margin:10px 0 0;font-size:13px">
+              为什么货架上常见青香蕉？通常是为了让它在运输/陈列过程中“可控地成熟”。香蕉属于典型的呼吸跃变型水果：在成熟过程中，乙烯信号会加速一系列变化（风味、软化、颜色）。
+            </p>
+            <div class="disclaimer">
+              温度提示（概念级）：香蕉在较低温环境可能出现“冷害”（果皮变暗、口感受损）。家庭场景里，可以把它理解为：别把偏青的香蕉长时间放在很冷的位置；已经熟了想延缓变软再冷藏更合适。（不同品种/成熟度阈值不同，常见经验约在 12–13°C 附近）
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Myths -->
+      <section class="section" id="myths" data-section="myths">
+        <div class="section-head">
+          <div>
+            <div class="kicker">05 / 常见误区</div>
+            <h2>你可能听过的说法：哪些是“过度简化”？</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">形式：折叠问答（避免一屏堆太多字）</div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <details class="faq">
+              <summary>“果皮有黑点=坏了？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                褐点更常见的含义是：成熟度更高、风味更甜；并不等同于腐败。真正需要丢弃的信号通常是：明显霉味、渗液、成片霉变、异常发酵气味等。
+              </div>
+            </details>
+            <details class="faq">
+              <summary>“放冰箱会让香蕉更快坏？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                冷藏会让果皮更快变黑（视觉上像“坏了”），但果肉不一定同步变质。更实用的经验是：偏青时尽量常温成熟；已经熟了、想延缓变软，可以冷藏（接受果皮颜色变化）。
+              </div>
+            </details>
+            <details class="faq">
+              <summary>“香蕉要挂着放才行？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                挂放的价值更多是“避免压伤”和“通风”。如果你的台面不拥挤、不会被压，平放也可以。关键是：别闷在密封袋里、别晒、别压伤。
+              </div>
+            </details>
+          </div>
+          <div>
+            <details class="faq">
+              <summary>“空腹不能吃香蕉？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                很多饮食禁忌来自个体体验或网络转述。一般人群把香蕉作为早餐的一部分通常没问题；如果你有胃肠道疾病、糖代谢问题或特殊医嘱，请按医生/营养师建议调整。
+                <div class="disclaimer" style="margin-top:10px">
+                  这页不是医疗建议：目标是帮助你理解成熟与保存机制，避免误判“黑皮=坏”这类生活坑。
+                </div>
+              </div>
+            </details>
+            <details class="faq">
+              <summary>“越大越甜？越黄越好？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                甜度和风味更多与成熟度、品种、产地与采收时机有关；“大/小”不是可靠指标。挑选时优先看：是否压伤、是否均匀、你打算什么时候吃（配合成熟度 1–7）。
+              </div>
+            </details>
+            <details class="faq">
+              <summary>“香蕉能不能和别的水果放一起？” <span class="chev" aria-hidden="true"></span></summary>
+              <div class="faq-body">
+                可以，但要知道“互相影响”：香蕉成熟会释放乙烯，也会被其他水果释放的乙烯影响。想加速成熟：可同放苹果/梨；想放慢：尽量分开、保持通风。
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Quiz -->
+      <section class="section" id="quiz" data-section="quiz">
+        <div class="section-head">
+          <div>
+            <div class="kicker">06 / 小测验</div>
+            <h2>3 分钟自检：你现在能不能“买对 + 放对”？</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">交互：选择答案 → 立即反馈 → 汇总得分</div>
+        </div>
+
+        <div class="card pad">
+          <div class="quiz" id="quizList" aria-label="测验题目列表"></div>
+          <div class="score" id="score" role="status" aria-live="polite">
+            <div><strong id="scoreStrong">未完成</strong> <span id="scoreText">选完每题后自动计算。</span></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn" type="button" id="btnReveal">显示全部解析</button>
+              <button class="btn btn-primary" type="button" id="btnRetry">再做一次</button>
+            </div>
+          </div>
+          <p class="muted" style="margin:12px 0 0;font-size:12px">
+            线框占位：如果你希望更“课堂感”，下一步可以把每题的解析变成一张小卡片，配一张示意图（依然避免无来源数据）。
+          </p>
+        </div>
+      </section>
+
+      <section class="section" aria-label="总结">
+        <div class="section-head">
+          <div>
+            <div class="kicker">收束</div>
+            <h2>一句话总结：把香蕉当成“会继续变化的食材”</h2>
+          </div>
+          <div class="muted mono" style="font-size:12px">你可以复制要点发给家人</div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card pad">
+            <h3 style="margin:0 0 6px;font-size:14px;letter-spacing:-.01em">买的时候</h3>
+            <p class="muted" style="margin:0;font-size:13px">先问自己“什么时候吃”，再选成熟度；优先避免压伤与渗液。</p>
+          </div>
+          <div class="card pad">
+            <h3 style="margin:0 0 6px;font-size:14px;letter-spacing:-.01em">放的时候</h3>
+            <p class="muted" style="margin:0;font-size:13px">常温通风为默认；想快就纸袋催熟；熟了再冷藏延缓变软。</p>
+          </div>
+          <div class="card pad">
+            <h3 style="margin:0 0 6px;font-size:14px;letter-spacing:-.01em">吃不完</h3>
+            <p class="muted" style="margin:0;font-size:13px">剥皮切段冷冻最省心；做奶昔/烘焙更适合“褐点甜香蕉”。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <div>
+          <div style="font-family:var(--font-display);letter-spacing:-.02em;font-weight:820;color:var(--fg)">香蕉的一生（线框）</div>
+          <div class="muted" style="margin-top:6px;font-size:12px;max-width:70ch">
+            这是一份“结构 + 交互优先”的科普单页原型。确认内容与节奏后，可以再补：更强插图、真实照片、以及你希望引用的权威来源链接（如果你提供来源，我可以把引用嵌到文末）。
+          </div>
+        </div>
+        <div class="footer-links">
+          <a href="#what">回到顶部</a>
+          <a href="#storage">保存决策器</a>
+          <a href="#quiz">小测验</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="banana-life.js"></script>
+  </body>
+</html>
