@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>科普站点（多页骨架）</title>
+    <meta name="description" content="桌面端多页科普站点：index 入口 + 多章节页（带目录、进度与站内搜索）。" />
+    <style>
+      :root{
+        /* Direction: Modern minimal (Linear / Vercel) */
+        --bg:      oklch(99% 0.002 240);
+        --surface: oklch(100% 0 0);
+        --fg:      oklch(18% 0.012 250);
+        --muted:   oklch(54% 0.012 250);
+        --border:  oklch(92% 0.005 250);
+        --accent:  oklch(58% 0.18 255);
+        --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+        --font-body:    -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        /* Site extensions (derived in OKLch) */
+        --accent2: oklch(66% 0.14 155);
+        --success: oklch(64% 0.14 145);
+        --warn:    oklch(78% 0.14 80);
+        --danger:  oklch(62% 0.20 25);
+        --shadow-float: 0 28px 70px oklch(20% 0.02 250 / .16);
+        --container: 1160px;
+        --gutter: 24px;
+        --bw: 1px;
+        --rsm: 10px;
+        --rmd: 14px;
+        --rlg: 18px;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:var(--font-body);
+        color:var(--fg);
+        line-height:1.45;
+        text-wrap:pretty;
+        background:
+          radial-gradient(980px 420px at 14% -8%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 62%),
+          radial-gradient(860px 420px at 88% 6%, color-mix(in oklch, var(--accent2) 11%, transparent), transparent 62%),
+          var(--bg);
+      }
+      a{color:inherit;text-decoration:none}
+      a:hover{text-decoration:underline}
+      :focus-visible{outline:3px solid color-mix(in oklch, var(--accent) 42%, white);outline-offset:2px;border-radius:12px}
+      .container{width:min(var(--container), calc(100% - var(--gutter)*2));margin:0 auto}
+      .muted{color:var(--muted)}
+      .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+      .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+      .skip-link{position:fixed;left:16px;top:14px;z-index:100;transform:translateY(-160%);transition:transform 140ms ease;text-decoration:none!important}
+      .skip-link:focus-visible{transform:translateY(0)}
+
+      /* Top nav */
+      .nav{
+        position:sticky;top:0;z-index:50;
+        border-bottom:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 86%, transparent);
+        backdrop-filter:blur(10px);
+      }
+      .nav-inner{display:flex;align-items:center;gap:14px;justify-content:space-between;padding:14px 0}
+      .brand{display:flex;align-items:center;gap:10px;min-width:250px}
+      .mark{
+        width:28px;height:28px;border-radius:10px;border:var(--bw) solid var(--border);
+        background:linear-gradient(135deg, color-mix(in oklch, var(--accent) 28%, white), color-mix(in oklch, var(--accent) 8%, white));
+      }
+      .brand-name{font-family:var(--font-display);letter-spacing:-.02em;font-weight:780;font-size:14px}
+      .brand-sub{font-size:12px;color:var(--muted)}
+      .nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+      .nav-links a{padding:8px 10px;border-radius:12px;font-size:13px;color:var(--muted)}
+      .nav-links a:hover{text-decoration:none;background:color-mix(in oklch, var(--surface) 90%, var(--accent))}
+      .actions{display:flex;align-items:center;gap:10px}
+
+      .btn{
+        display:inline-flex;align-items:center;justify-content:center;gap:10px;
+        height:40px;padding:0 14px;border-radius:12px;
+        border:var(--bw) solid var(--border);
+        background:var(--surface);
+        color:var(--fg);
+        font-weight:700;font-size:13px;letter-spacing:-.01em;
+        cursor:pointer;user-select:none;
+        transition:transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      }
+      .btn:hover{background:color-mix(in oklch, var(--surface) 92%, var(--accent))}
+      .btn:active{transform:translateY(1px)}
+      .btn-primary{
+        border-color:color-mix(in oklch, var(--accent) 38%, var(--border));
+        background:color-mix(in oklch, var(--accent) 12%, var(--surface));
+      }
+      .kbd{
+        font-family:var(--font-mono);
+        font-size:12px;color:var(--muted);
+        padding:6px 8px;border-radius:10px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--accent));
+      }
+
+      /* Hero */
+      header.hero{padding:44px 0 18px}
+      .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch}
+      .panel{
+        border:var(--bw) solid var(--border);
+        border-radius:var(--rlg);
+        background:color-mix(in oklch, var(--surface) 86%, transparent);
+      }
+      .hero-copy{padding:26px}
+      .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+      .dot{width:9px;height:9px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 6px color-mix(in oklch, var(--accent) 14%, transparent)}
+      h1{
+        margin:14px 0 10px;
+        font-family:var(--font-display);
+        font-size:clamp(38px, 3.2vw, 52px);
+        line-height:1.06;
+        letter-spacing:-.03em;
+      }
+      .lede{margin:0;color:var(--muted);max-width:60ch;font-size:16px}
+      .hero-cta{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+      .micro{margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+      .micro span{display:inline-flex;align-items:center;gap:10px}
+      .micro b{
+        display:inline-flex;align-items:center;justify-content:center;
+        width:18px;height:18px;border-radius:7px;
+        border:var(--bw) solid var(--border);
+        background:var(--surface);
+        color:color-mix(in oklch, var(--muted) 70%, var(--fg));
+        font-weight:900;font-size:11px;
+      }
+
+      .hero-right{display:grid;grid-template-rows:auto 1fr}
+      .mini{
+        padding:18px 18px 16px;
+        border-bottom:var(--bw) solid var(--border);
+        display:flex;align-items:center;justify-content:space-between;gap:12px;
+      }
+      .mini h2{
+        margin:0;
+        font-family:var(--font-display);
+        letter-spacing:-.02em;
+        font-size:14px;
+      }
+      .mini p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+      .continue{
+        padding:16px 18px;
+        display:grid;gap:12px;
+      }
+      .continue-card{
+        display:flex;align-items:center;justify-content:space-between;gap:12px;
+        padding:14px;border-radius:14px;border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--accent));
+      }
+      .continue-card strong{font-size:13px}
+      .continue-card small{display:block;margin-top:2px;color:var(--muted);font-size:12px}
+      .arrow{font-size:14px;color:var(--muted)}
+
+      /* Content */
+      main{padding:18px 0 54px}
+      .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:10px 0 12px}
+      .section-head h3{
+        margin:0;
+        font-family:var(--font-display);
+        letter-spacing:-.02em;
+        font-size:18px;
+      }
+      .section-head .hint{margin:0;color:var(--muted);font-size:13px;max-width:66ch}
+      .grid{
+        display:grid;
+        grid-template-columns:repeat(12, 1fr);
+        gap:14px;
+      }
+      .card{
+        grid-column:span 6;
+        padding:18px;
+        border:var(--bw) solid var(--border);
+        border-radius:var(--rlg);
+        background:color-mix(in oklch, var(--surface) 92%, transparent);
+        display:grid;gap:10px;
+        min-height:168px;
+      }
+      .card:hover{border-color:color-mix(in oklch, var(--accent) 28%, var(--border));text-decoration:none}
+      .card h4{
+        margin:0;
+        font-family:var(--font-display);
+        letter-spacing:-.02em;
+        font-size:16px;
+        line-height:1.15;
+      }
+      .tags{display:flex;gap:8px;flex-wrap:wrap}
+      .tag{
+        display:inline-flex;align-items:center;gap:8px;
+        padding:6px 10px;border-radius:999px;
+        border:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 92%, var(--accent));
+        font-size:12px;color:var(--muted);
+      }
+      .tag i{width:6px;height:6px;border-radius:999px;background:var(--accent)}
+      .bullets{margin:0;padding-left:18px;color:var(--muted);font-size:13px}
+      .bullets li{margin:6px 0}
+      .meta-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+      .meta-row .mono{font-size:12px;color:var(--muted)}
+
+      /* Footer */
+      footer{
+        padding:20px 0 34px;
+        border-top:var(--bw) solid var(--border);
+        background:color-mix(in oklch, var(--surface) 80%, transparent);
+      }
+      .foot{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+      .foot nav{display:flex;gap:10px;flex-wrap:wrap}
+      .foot a{padding:8px 10px;border-radius:12px;color:var(--muted);font-size:13px}
+      .foot a:hover{text-decoration:none;background:color-mix(in oklch, var(--surface) 92%, var(--accent))}
+      .foot small{display:block;color:var(--muted);font-size:12px;max-width:72ch}
+
+      /* Search dialog */
+      dialog{
+        width:min(860px, calc(100% - 32px));
+        border:var(--bw) solid var(--border);
+        border-radius:18px;
+        background:var(--surface);
+        padding:0;
+        box-shadow:var(--shadow-float);
+      }
+      dialog::backdrop{background:oklch(10% 0.02 250 / .34);backdrop-filter:blur(4px)}
+      .dlg-top{padding:14px 14px 12px;border-bottom:var(--bw) solid var(--border);display:flex;align-items:center;gap:10px}
+      .search{
+        flex:1;
+        display:flex;align-items:center;gap:10px;
+        border:var(--bw) solid var(--border);
+        border-radius:14px;
+        padding:10px 12px;
+        background:color-mix(in oklch, var(--surface) 92%, var(--accent));
+      }
+      .search input{
+        width:100%;
+        border:0;outline:0;background:transparent;color:var(--fg);
+        font-size:14px;font-family:var(--font-body);
+      }
+      .dlg-body{padding:12px 14px 14px;max-height:min(64vh, 620px);overflow:auto}
+      .results{display:grid;gap:10px}
+      .result{
+        border:var(--bw) solid var(--border);
+        border-radius:16px;
+        padding:12px 12px;
+        display:grid;gap:6px;
+        background:color-mix(in oklch, var(--surface) 96%, transparent);
+      }
+      .result:hover{border-color:color-mix(in oklch, var(--accent) 28%, var(--border));text-decoration:none}
+      .result .title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .result strong{font-size:13px;letter-spacing:-.01em}
+      .result .path{font-size:12px;color:var(--muted)}
+      .empty{padding:18px;border-radius:16px;border:var(--bw) dashed color-mix(in oklch, var(--border) 70%, var(--muted));color:var(--muted);font-size:13px}
+
+      @media (max-width: 980px){
+        .hero-grid{grid-template-columns:1fr}
+        .card{grid-column:span 12}
+        .brand{min-width:auto}
+        .nav-links{display:none}
+      }
+      @media (prefers-reduced-motion: reduce){
+        *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link btn" href="#main">跳到正文</a>
+
+    <div class="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="science-index.html" aria-label="回到首页">
+          <span class="mark" aria-hidden="true"></span>
+          <span>
+            <span class="brand-name">科普站点（骨架）</span>
+            <span class="brand-sub">index 入口 + 多章节页</span>
+          </span>
+        </a>
+
+        <nav class="nav-links" aria-label="章节">
+          <a href="science/chapters/01-scientific-method.html">科学方法</a>
+          <a href="science/chapters/02-correlation-causation.html">相关与因果</a>
+          <a href="science/chapters/03-energy-heat.html">能量与热</a>
+          <a href="science/chapters/04-climate-basics.html">气候基础</a>
+          <a href="science/chapters/05-health-risk.html">健康与风险</a>
+        </nav>
+
+        <div class="actions">
+          <button class="btn" type="button" id="openSearch" aria-haspopup="dialog">
+            站内搜索 <span class="kbd" aria-hidden="true">K</span>
+          </button>
+          <a class="btn btn-primary" href="science/chapters/01-scientific-method.html">开始阅读</a>
+        </div>
+      </div>
+    </div>
+
+    <header class="hero">
+      <div class="container hero-grid">
+        <section class="panel hero-copy" aria-label="概览">
+          <div class="eyebrow"><span class="dot" aria-hidden="true"></span><span class="mono">Desktop web · 现代极简</span></div>
+          <h1>把“科普”做成可维护的多页站点。</h1>
+          <p class="lede">
+            这是一套可直接扩展的多章节结构：统一导航、章节目录、阅读进度、站内搜索、可复制的引用锚点。
+            文案与主题目前以“可替换示例”呈现——你给我一个主线主题（例如：气候、AI、健康、天文），我就把章节与图解一起替换成你的内容。
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="science/chapters/01-scientific-method.html">从第 1 章开始</a>
+            <button class="btn" type="button" id="openSearch2">先搜一下</button>
+            <span class="kbd" title="快捷键">按 <span class="mono">K</span> 打开搜索</span>
+          </div>
+          <div class="micro" aria-label="设计要点">
+            <span><b>1</b>一处主强调色（按钮/高亮）</span>
+            <span><b>2</b>章节页带侧栏目录 + 进度条</span>
+            <span><b>3</b>不编造数据：需要处留“待补充”</span>
+          </div>
+        </section>
+
+        <aside class="panel hero-right" aria-label="继续阅读">
+          <div class="mini">
+            <div>
+              <h2>继续阅读</h2>
+              <p>自动记住你上次看的章节位置。</p>
+            </div>
+            <span class="kbd mono">localStorage</span>
+          </div>
+          <div class="continue">
+            <a class="continue-card" id="continueLink" href="science/chapters/01-scientific-method.html">
+              <span>
+                <strong id="continueTitle">暂无阅读记录</strong>
+                <small id="continueSub">从第 1 章开始是最好的默认。</small>
+              </span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <div class="muted" style="font-size:13px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span>想让我直接填成你的主题？</span>
+                <a class="btn" href="#brief">给我主题</a>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main id="main" class="container" tabindex="-1">
+      <section aria-label="章节列表">
+        <div class="section-head">
+          <div>
+            <h3>章节（可替换示例）</h3>
+            <p class="hint">每一章是一份独立 HTML 页面：适合维护、更新、SEO，也便于逐章审阅。</p>
+          </div>
+          <p class="hint mono">5 chapters · 可增至 12+</p>
+        </div>
+
+        <div class="grid" id="chapterGrid"></div>
+      </section>
+
+      <section id="brief" style="margin-top:18px" aria-label="下一步">
+        <div class="panel" style="padding:18px">
+          <div class="section-head" style="margin:0 0 10px">
+            <div>
+              <h3>下一步（你一句话就够）</h3>
+              <p class="hint">我会把“示例章节”替换成你的真实主线，并补齐图解、术语卡、误区澄清与参考来源结构。</p>
+            </div>
+          </div>
+          <ul class="bullets">
+            <li><b>主线主题：</b>例如“气候变化入门”“AI 可信与偏差”“营养与运动误区”“宇宙尺度与天体物理”。</li>
+            <li><b>读者：</b>大众/高中生/大学通识/家长/管理者（不同读者决定图解密度与措辞）。</li>
+            <li><b>是否要引文规范：</b>只放链接，还是 MLA/APA？（不确定可先“链接 + 访问日期”）</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container foot">
+        <div>
+          <div class="brand-name" style="margin-bottom:6px">科普站点（骨架）</div>
+          <small>这是一个可直接落地的多页结构示例。章节内容中的“待补充/可替换示例”是刻意的：避免编造数据与来源。</small>
+        </div>
+        <nav aria-label="页脚链接">
+          <a href="science-index.html">首页</a>
+          <a href="science/chapters/01-scientific-method.html">第 1 章</a>
+          <a href="#" id="openSearch3">搜索</a>
+        </nav>
+      </div>
+    </footer>
+
+    <dialog id="searchDialog" aria-label="站内搜索">
+      <div class="dlg-top">
+        <div class="search" role="search">
+          <span class="mono muted" aria-hidden="true">/</span>
+          <label class="sr-only" for="q">搜索章节与小节</label>
+          <input id="q" type="text" autocomplete="off" placeholder="输入关键词：例如 证据 / 相关性 / 碳循环…" />
+        </div>
+        <button class="btn" type="button" id="closeSearch">关闭</button>
+      </div>
+      <div class="dlg-body">
+        <div class="results" id="results"></div>
+        <div class="empty" id="emptyState" hidden>没有匹配结果。提示：试试更短的关键词，或只搜一个概念名。</div>
+      </div>
+    </dialog>
+
+    <script>
+      const CHAPTERS = [
+        {
+          id: "01",
+          title: "科学方法：如何把观点变成可检验的论证",
+          href: "science/chapters/01-scientific-method.html",
+          tags: ["证据", "可证伪", "研究设计"],
+          bullets: ["用一个可复现的小例子解释“假设→预测→证据”。", "把常见误区（轶事证据、选择偏差）放在同一个框架里。"]
+        },
+        {
+          id: "02",
+          title: "相关与因果：为什么“看起来有关”不等于“导致”",
+          href: "science/chapters/02-correlation-causation.html",
+          tags: ["统计", "混杂因素", "因果图"],
+          bullets: ["用一张因果图解释“共同原因/反向因果”。", "给读者一个“看到图表时的自检清单”。"]
+        },
+        {
+          id: "03",
+          title: "能量与热：从厨房到宇宙的共同语言",
+          href: "science/chapters/03-energy-heat.html",
+          tags: ["物理", "热力学", "直觉修正"],
+          bullets: ["澄清“热 vs 温度”“能量守恒”的日常误解。", "用一个图解解释能量流与效率。"]
+        },
+        {
+          id: "04",
+          title: "气候基础：碳循环、辐射收支与反馈",
+          href: "science/chapters/04-climate-basics.html",
+          tags: ["气候", "碳循环", "不确定性"],
+          bullets: ["把模型与不确定性讲清楚：不确定≠不知道。", "给出参考来源结构（机构报告/论文/数据集）。"]
+        },
+        {
+          id: "05",
+          title: "健康与风险：如何读懂“风险增加 X%”这句话",
+          href: "science/chapters/05-health-risk.html",
+          tags: ["医学", "绝对风险", "RCT"],
+          bullets: ["对比“相对风险/绝对风险/基线风险”。", "把研究等级（观察研究 vs RCT）做成可视化阶梯。"]
+        }
+      ];
+
+      const SEARCH_INDEX = CHAPTERS.flatMap(c => ([
+        { label: `第 ${c.id} 章`, title: c.title, path: c.href, haystack: `${c.title} ${c.tags.join(" ")} ${c.bullets.join(" ")}` }
+      ]));
+
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const dialog = $("#searchDialog");
+      const q = $("#q");
+      const results = $("#results");
+      const emptyState = $("#emptyState");
+
+      function renderChapters(){
+        const grid = $("#chapterGrid");
+        grid.innerHTML = CHAPTERS.map(c => {
+          const tagHtml = c.tags.map(t => `<span class="tag"><i aria-hidden="true"></i>${escapeHtml(t)}</span>`).join("");
+          const bullets = c.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("");
+          return `
+            <a class="card" href="${c.href}" aria-label="打开章节：${escapeHtml(c.title)}">
+              <div class="tags">${tagHtml}</div>
+              <h4>${escapeHtml(c.title)}</h4>
+              <ul class="bullets">${bullets}</ul>
+              <div class="meta-row">
+                <span class="mono">chapter ${c.id}</span>
+                <span class="mono">打开 →</span>
+              </div>
+            </a>
+          `;
+        }).join("");
+      }
+
+      function openSearch(){
+        if (!dialog.open) dialog.showModal();
+        q.value = "";
+        updateResults("");
+        setTimeout(() => q.focus(), 0);
+      }
+      function closeSearch(){ if (dialog.open) dialog.close(); }
+
+      function updateResults(query){
+        const normalized = (query || "").trim().toLowerCase();
+        const items = normalized
+          ? SEARCH_INDEX.filter(it => it.haystack.toLowerCase().includes(normalized))
+          : SEARCH_INDEX.slice(0, 6);
+        results.innerHTML = items.map(it => `
+          <a class="result" href="${it.path}">
+            <div class="title">
+              <strong>${escapeHtml(it.label)} · ${escapeHtml(it.title)}</strong>
+              <span class="path mono">${escapeHtml(it.path.replace(/^science\\//,""))}</span>
+            </div>
+            <div class="muted" style="font-size:13px">点击进入章节页，再用侧栏目录定位到小节。</div>
+          </a>
+        `).join("");
+        emptyState.hidden = items.length !== 0;
+      }
+
+      function escapeHtml(s){
+        return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      }
+
+      function hydrateContinue(){
+        const last = localStorage.getItem("science:last");
+        const title = $("#continueTitle");
+        const sub = $("#continueSub");
+        const link = $("#continueLink");
+        if (!last){
+          title.textContent = "暂无阅读记录";
+          sub.textContent = "从第 1 章开始是最好的默认。";
+          link.href = CHAPTERS[0].href;
+          return;
+        }
+        const clean = last.replace(/^[.\\/]+/,"");
+        link.href = clean;
+        title.textContent = "继续上次阅读";
+        sub.textContent = clean;
+      }
+
+      renderChapters();
+      hydrateContinue();
+
+      $("#openSearch").addEventListener("click", openSearch);
+      $("#openSearch2").addEventListener("click", openSearch);
+      $("#openSearch3").addEventListener("click", (e) => { e.preventDefault(); openSearch(); });
+      $("#closeSearch").addEventListener("click", closeSearch);
+      q.addEventListener("input", () => updateResults(q.value));
+      dialog.addEventListener("click", (e) => { if (e.target === dialog) closeSearch(); });
+
+      window.addEventListener("keydown", (e) => {
+        const isTyping = ["INPUT","TEXTAREA"].includes(document.activeElement?.tagName);
+        if (e.key === "Escape") closeSearch();
+        if (isTyping) return;
+        if (e.key.toLowerCase() === "k"){
+          e.preventDefault();
+          openSearch();
+        }
+        if (e.key === "/"){
+          e.preventDefault();
+          openSearch();
+        }
+      });
+    </script>
+  </body>
+</html>
+
