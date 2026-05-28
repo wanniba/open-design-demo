@@ -168,10 +168,60 @@
         font-size: clamp(18px, 2.2vw, 26px);
         line-height: 1.15;
       }
+      .heroKey{
+        display:inline;
+        padding: 0 0.08em;
+        border-radius: 10px;
+        background:
+          linear-gradient(180deg,
+            transparent 62%,
+            color-mix(in oklch, var(--accent) 22%, white) 62%,
+            color-mix(in oklch, var(--accent) 10%, white) 100%);
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+        text-shadow: 0 1px 0 color-mix(in oklch, white 60%, transparent);
+      }
       .hero p{margin:8px 0 0; color: color-mix(in oklch, var(--fg) 70%, var(--muted));}
       .hero__meta{
         display:flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;
       }
+      .heroPoster{
+        margin-top: 14px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: color-mix(in oklch, var(--surface) 86%, var(--bg));
+        box-shadow: var(--shadow-sm);
+        overflow:hidden;
+      }
+      .heroPoster__head{
+        display:flex; align-items:center; justify-content:space-between;
+        gap: 12px;
+        padding: 12px 12px 10px;
+        border-bottom: 1px solid var(--border);
+        background: color-mix(in oklch, var(--surface) 72%, var(--bg));
+      }
+      .heroPoster__labels{display:flex; flex-wrap: wrap; gap: 8px; align-items:center;}
+      .heroPoster__actions{display:flex; gap: 8px; align-items:center; flex-wrap: wrap; justify-content:flex-end;}
+      .heroPoster__canvas{
+        position:relative;
+        aspect-ratio: 16 / 9;
+        background: var(--surface);
+      }
+      .heroPoster__canvas svg{
+        width: 100%;
+        height: 100%;
+        display:block;
+      }
+      .heroPoster__hint{
+        position:absolute;
+        left: 12px;
+        bottom: 12px;
+        display:flex;
+        gap: 8px;
+        align-items:center;
+        pointer-events:none;
+      }
+      .heroPoster__hint .tag{background: color-mix(in oklch, var(--surface) 85%, var(--bg));}
 
       .searchbar{
         display:flex; align-items:center; gap: 10px;
@@ -519,7 +569,7 @@
       <div class="container">
         <div class="hero__row">
           <div>
-            <h2>像采购软件一样采购 Agent：安全边界、权限清单、发票与订阅一起走。</h2>
+            <h2>像采购软件一样采购 Agent：<span class="heroKey">安全边界</span>、<span class="heroKey">权限清单</span>、<span class="heroKey">发票与订阅一起走</span>。</h2>
             <p>面向企业采购：按任务/行业筛选，可查看能力、价格、权限与部署方式；支持 PO、年付、发票抬头与管理员审批流（原型）。</p>
           </div>
           <div class="hero__meta" aria-label="采购提示">
@@ -528,6 +578,131 @@
             <span class="pill"><span class="mono">VPC</span> 部署可选</span>
           </div>
         </div>
+
+        <section class="heroPoster" aria-label="采购要点海报（可下载）">
+          <div class="heroPoster__head">
+            <div class="heroPoster__labels">
+              <span class="tag tag--accent">采购要点（单图）</span>
+              <span class="tag">法务/安全/财务一起看</span>
+            </div>
+            <div class="heroPoster__actions">
+              <button class="btn" id="btnCopyPosterText" type="button">复制要点</button>
+              <button class="btn btn--primary" id="btnDownloadPoster" type="button">下载 PNG</button>
+            </div>
+          </div>
+          <div class="heroPoster__canvas">
+            <svg id="procPoster" viewBox="0 0 1600 900" role="img" aria-label="采购要点：安全边界、权限清单、发票与订阅一起走" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bgWash" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="var(--bg)"/>
+                  <stop offset="1" stop-color="var(--surface)"/>
+                </linearGradient>
+                <linearGradient id="accentInk" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="var(--accent)"/>
+                  <stop offset="1" stop-color="color-mix(in oklch, var(--accent) 55%, oklch(70% 0.16 260))"/>
+                </linearGradient>
+                <pattern id="microGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M40 0H0V40" fill="none" stroke="var(--border)" stroke-width="1"/>
+                </pattern>
+                <filter id="titleGlow" x="-20%" y="-40%" width="140%" height="180%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="color-mix(in oklch, var(--accent) 25%, transparent)" flood-opacity="1"/>
+                  <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="oklch(0% 0 0 / 0.14)" flood-opacity="1"/>
+                </filter>
+                <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="oklch(0% 0 0 / 0.10)" flood-opacity="1"/>
+                </filter>
+                <style id="posterTheme">
+                  /* Theme injected for PNG export */
+                </style>
+                <style>
+                  .ink{fill: var(--fg)}
+                  .muted{fill: var(--muted)}
+                  .border{stroke: var(--border)}
+                  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+                  .display{font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;}
+                  .body{font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;}
+                  .kicker{letter-spacing: .18em; font-weight: 700;}
+                  .art{font-weight: 900; letter-spacing: -0.02em;}
+                  .cardTitle{font-weight: 800; letter-spacing: -0.01em;}
+                </style>
+              </defs>
+
+              <rect x="0" y="0" width="1600" height="900" rx="36" fill="var(--surface)"/>
+              <rect x="0" y="0" width="1600" height="900" rx="36" fill="url(#bgWash)"/>
+              <rect x="0" y="0" width="1600" height="900" rx="36" fill="url(#microGrid)" opacity="0.55"/>
+
+              <g transform="translate(92 86)">
+                <text class="display kicker muted" x="0" y="0" font-size="14">PROCUREMENT-READY · 企业采购</text>
+
+                <g filter="url(#titleGlow)" transform="translate(0 30)">
+                  <text class="display art" x="0" y="70" font-size="74" fill="url(#accentInk)" stroke="color-mix(in oklch, var(--accent) 35%, var(--border))" stroke-width="2.5" paint-order="stroke">
+                    安全 · 权限 · 财务
+                  </text>
+                  <text class="display art" x="0" y="138" font-size="46" fill="var(--fg)" opacity="0.92">
+                    一张图讲清采购三件套
+                  </text>
+                </g>
+
+                <text class="body muted" x="0" y="232" font-size="20">
+                  安全边界、权限清单、发票与订阅在同一流程里闭环：可审计、可审批、可对账。
+                </text>
+              </g>
+
+              <g transform="translate(92 320)" filter="url(#cardShadow)">
+                <g transform="translate(0 0)">
+                  <rect x="0" y="0" width="468" height="468" rx="26" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+                  <rect x="24" y="24" width="84" height="36" rx="18" fill="color-mix(in oklch, var(--accent) 14%, white)" stroke="color-mix(in oklch, var(--accent) 30%, var(--border))" stroke-width="1.5"/>
+                  <text class="mono" x="42" y="49" font-size="16" fill="color-mix(in oklch, var(--accent) 72%, black)">01</text>
+                  <text class="display cardTitle ink" x="24" y="112" font-size="34">安全边界</text>
+                  <text class="body muted" x="24" y="152" font-size="18">先界定“能做什么/不能做什么”</text>
+                  <text class="body ink" x="24" y="214" font-size="20">
+                    <tspan x="24" dy="0">• 部署边界：SaaS / VPC / 本地</tspan>
+                    <tspan x="24" dy="36">• 数据边界：可见范围、留存、脱敏</tspan>
+                    <tspan x="24" dy="36">• 审计边界：日志、证据链、导出</tspan>
+                    <tspan x="24" dy="36">• 供应商边界：合规证书与责任</tspan>
+                  </text>
+                </g>
+
+                <g transform="translate(520 0)">
+                  <rect x="0" y="0" width="468" height="468" rx="26" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+                  <rect x="24" y="24" width="84" height="36" rx="18" fill="color-mix(in oklch, var(--accent) 14%, white)" stroke="color-mix(in oklch, var(--accent) 30%, var(--border))" stroke-width="1.5"/>
+                  <text class="mono" x="42" y="49" font-size="16" fill="color-mix(in oklch, var(--accent) 72%, black)">02</text>
+                  <text class="display cardTitle ink" x="24" y="112" font-size="34">权限清单</text>
+                  <text class="body muted" x="24" y="152" font-size="18">把“要接什么系统、要什么权限”写明</text>
+                  <text class="body ink" x="24" y="214" font-size="20">
+                    <tspan x="24" dy="0">• 权限范围：读/写、对象、字段</tspan>
+                    <tspan x="24" dy="36">• 账号/密钥：谁保管、如何轮换</tspan>
+                    <tspan x="24" dy="36">• 审批流：管理员/安全负责人</tspan>
+                    <tspan x="24" dy="36">• 失效：到期回收、离职回收</tspan>
+                  </text>
+                </g>
+
+                <g transform="translate(1040 0)">
+                  <rect x="0" y="0" width="468" height="468" rx="26" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+                  <rect x="24" y="24" width="84" height="36" rx="18" fill="color-mix(in oklch, var(--accent) 14%, white)" stroke="color-mix(in oklch, var(--accent) 30%, var(--border))" stroke-width="1.5"/>
+                  <text class="mono" x="42" y="49" font-size="16" fill="color-mix(in oklch, var(--accent) 72%, black)">03</text>
+                  <text class="display cardTitle ink" x="24" y="112" font-size="34">发票与订阅一起走</text>
+                  <text class="body muted" x="24" y="152" font-size="18">付款→开票→续费：同一工单闭环</text>
+                  <text class="body ink" x="24" y="214" font-size="20">
+                    <tspan x="24" dy="0">• 付款：PO / 年付 / 用量</tspan>
+                    <tspan x="24" dy="36">• 开票：抬头、税号、地址、收件</tspan>
+                    <tspan x="24" dy="36">• 对账：席位/用量明细可导出</tspan>
+                    <tspan x="24" dy="36">• 续费：提醒、审批、预算占用</tspan>
+                  </text>
+                </g>
+              </g>
+
+              <g transform="translate(92 848)">
+                <text class="mono muted" x="0" y="0" font-size="14">Agent Marketplace Prototype · 可作为“采购沟通单图”附件</text>
+                <text class="mono muted" x="1508" y="0" font-size="14" text-anchor="end">v0</text>
+              </g>
+            </svg>
+
+            <div class="heroPoster__hint" aria-hidden="true">
+              <span class="tag">提示：下载后可直接贴到邮件/IM</span>
+            </div>
+          </div>
+        </section>
 
         <div class="searchbar" role="search" aria-label="搜索 Agents">
           <label class="sr-only" for="q">搜索</label>
@@ -685,6 +860,66 @@
       const moneyCNY = (n) => `¥${Math.round(n).toLocaleString('zh-CN')}`;
       const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
       const uniq = (arr) => Array.from(new Set(arr));
+
+      function injectPosterTheme(svgEl){
+        if (!svgEl) return;
+        const themeStyle = svgEl.querySelector("#posterTheme");
+        if (!themeStyle) return;
+        const cs = getComputedStyle(document.documentElement);
+        const vars = [
+          "--bg","--surface","--fg","--muted","--border","--accent","--accent-ink","--success","--warn","--danger"
+        ];
+        const decl = vars.map(v => `${v}:${cs.getPropertyValue(v).trim() || ""};`).join("");
+        themeStyle.textContent = `:root{${decl}}`;
+      }
+
+      async function downloadInlineSvgAsPng(svgEl, filename){
+        if (!svgEl) return;
+        // Clone so we can inject theme vars for the standalone SVG blob.
+        const clone = svgEl.cloneNode(true);
+        injectPosterTheme(clone);
+        clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        const svgText = new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const img = new Image();
+        img.decoding = "async";
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = url;
+        });
+        URL.revokeObjectURL(url);
+
+        const vb = (svgEl.viewBox && svgEl.viewBox.baseVal) ? svgEl.viewBox.baseVal : { width: 1600, height: 900 };
+        const scale = Math.min(2, window.devicePixelRatio || 1) * 1.25; // crisp without huge files
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(vb.width * scale);
+        canvas.height = Math.round(vb.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const pngBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
+        if (!pngBlob) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(pngBlob);
+        a.download = filename || "procurement-poster.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2500);
+      }
+
+      function flashButton(btn, text, ms=1100){
+        if (!btn) return;
+        const prev = btn.textContent;
+        btn.textContent = text;
+        btn.disabled = true;
+        setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, ms);
+      }
 
       const DATA = [
         {
@@ -1597,6 +1832,35 @@
         $$("#btnSignIn").addEventListener("click", () => {
           state.signedIn = !state.signedIn;
           $$("#btnSignIn").textContent = state.signedIn ? "已登录" : "登录";
+        });
+
+        // Procurement poster (single-image callout)
+        const posterSvg = $$("#procPoster");
+        injectPosterTheme(posterSvg); // ensures the inline SVG renders with the same tokens
+        const btnDl = $$("#btnDownloadPoster");
+        btnDl?.addEventListener("click", async () => {
+          try{
+            await downloadInlineSvgAsPng(posterSvg, "采购要点-安全权限发票订阅.png");
+            flashButton(btnDl, "已下载");
+          }catch{
+            flashButton(btnDl, "下载失败");
+          }
+        });
+        const btnCopy = $$("#btnCopyPosterText");
+        btnCopy?.addEventListener("click", async () => {
+          const text =
+`采购要点（单图版）
+1) 安全边界：部署边界（SaaS/VPC/本地）｜数据范围/留存/脱敏｜审计日志与证据链导出｜供应商合规与责任
+2) 权限清单：权限范围（读/写/对象/字段）｜账号/密钥保管与轮换｜管理员/安全负责人审批｜到期/离职回收
+3) 发票与订阅一起走：PO/年付/用量｜抬头/税号/地址/收件｜席位/用量对账明细可导出｜续费提醒与审批
+（原型：Agent 商城企业采购）`;
+          try{
+            await navigator.clipboard.writeText(text);
+            flashButton(btnCopy, "已复制");
+          }catch{
+            // Fallback
+            window.prompt("复制采购要点：", text);
+          }
         });
       }
 
